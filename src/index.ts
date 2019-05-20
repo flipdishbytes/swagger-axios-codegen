@@ -11,10 +11,13 @@ import {
   customerServiceHeader,
   serviceTemplate,
   requestTemplate,
+  serviceByTemplate,
+  requestByTemplate,
 } from './template';
 import { requestCodegen } from './requestCodegen';
 import { ISwaggerOptions, IInclude } from './baseInterfaces';
 import { findDeepRefs } from './utils';
+import camelcase from 'camelcase';
 
 const defaultOptions: ISwaggerOptions = {
   serviceNameSuffix: 'Service',
@@ -28,8 +31,9 @@ const defaultOptions: ISwaggerOptions = {
 };
 
 // codegen({
-//   source:require(path.resolve('./flipdishdev.json'))
-// })
+//   source: require(path.resolve('./flipdishdev.json')),
+//   multipleFileBy: 'tagName',
+// });
 
 export async function codegen(params: ISwaggerOptions) {
   console.time('finish');
@@ -57,23 +61,36 @@ export async function codegen(params: ISwaggerOptions) {
   let apiSource = options.useCustomerRequestInstance ? customerServiceHeader : serviceHeader;
   // TODO: next next next time
   // if (options.multipleFileMode) {
-  if (false) {
-    const { models, enums } = definitionsCodeGen(swaggerSource.definitions);
-    // enums
-    Object.values(enums).forEach((item) => {
-      const text = item.value
-        ? enumTemplate(item.value.name, item.value.enumProps, 'Enum')
-        : item.content || '';
+  if (options.multipleFileBy) {
+    const definitions = definitionsCodeGen(swaggerSource.definitions);
 
-      const fileDir = path.join(options.outputDir || '', 'definitions');
-      writeFile(fileDir, item.name + '.ts', format(text, options));
+    Object.entries(requestCodegen(swaggerSource.paths)).forEach(([className, requests]) => {
+      let text = '';
+      requests.forEach((req) => {
+        const reqName = options.methodNameMode == 'operationId' ? req.operationId : req.name;
+        text += requestByTemplate(reqName, req.requestSchema, definitions);
+      });
+      text = serviceByTemplate(className + options.serviceNameSuffix, text);
+
+      const fileDir = path.join(options.outputDir || '');
+      writeFile(fileDir, camelcase(className) + '.ts', format(text, options));
     });
 
-    Object.values(models).forEach((item) => {
-      const text = classTemplate(item.value.name, item.value.props, item.value.imports);
-      const fileDir = path.join(options.outputDir || '', 'definitions');
-      writeFile(fileDir, item.name, format(text, options));
-    });
+    // // enums
+    // Object.values(enums).forEach((item) => {
+    //   const text = item.value
+    //     ? enumTemplate(item.value.name, item.value.enumProps, 'Enum')
+    //     : item.content || '';
+
+    //   const fileDir = path.join(options.outputDir || '', 'definitions');
+    //   writeFile(fileDir, item.name + '.ts', format(text, options));
+    // });
+
+    // Object.values(models).forEach((item) => {ks
+    //   const text = classTemplate(item.value.name, item.value.props, item.value.imports);
+    //   const fileDir = path.join(options.outputDir || '', 'definitions');
+    //   writeFile(fileDir, item.name, format(text, options));
+    // });
   } else if (options.include && options.include.length > 0) {
     let reqSource = '';
     let defSource = '';

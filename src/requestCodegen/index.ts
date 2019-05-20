@@ -37,7 +37,7 @@ export function requestCodegen(paths: IPaths): IRequestClass {
       }
       let parameters = '';
       let handleNullParameters = '';
-      let parsedParameters: any = {};
+      let parsedParameters: ReturnType<typeof getRequestParameters>;
 
       if (reqProps.parameters) {
         reqProps.parameters = reqProps.parameters.reduce((agg, p, i) => {
@@ -52,7 +52,7 @@ export function requestCodegen(paths: IPaths): IRequestClass {
 
         // 获取到接口的参数
         parsedParameters = getRequestParameters(reqProps.parameters);
-
+        
         parameters =
           parsedParameters.requestParameters.length > 0
             ? `params: {
@@ -81,7 +81,7 @@ export function requestCodegen(paths: IPaths): IRequestClass {
           path,
           pathReplace,
           parameters,
-          parsedParameters,
+          parsedParameters: parsedParameters || {},
           method,
           contentType,
           responseType,
