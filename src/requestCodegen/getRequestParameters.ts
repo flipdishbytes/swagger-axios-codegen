@@ -25,7 +25,7 @@ export function getRequestParameters(params: IParameter[]) {
         propType = refClassName(p.schema.$ref)
         // console.log('propType', refClassName(p.schema.$ref))
       } else if (p.schema.type) {
-        propType = p.schema.type
+        propType = toBaseType(p.schema.type)
       } else {
         throw new Error('Could not find property type on schema')
       }
@@ -54,7 +54,11 @@ export function getRequestParameters(params: IParameter[]) {
     } else if (p.in === 'query') {
       queryParameters.push(`'${paramName}':params['${paramName}']`)
     } else if (p.in === 'body') {
-      var body = p.schema ? `...params['${paramName}']` : `'${paramName}':params['${paramName}']`
+      var body = p.schema
+        ? p.schema.$ref
+          ? `...params['${paramName}']`
+          : `${paramName}:params['${paramName}']`
+        : `'${paramName}':params['${paramName}']`
       bodyParameters.push(body)
     }
   })

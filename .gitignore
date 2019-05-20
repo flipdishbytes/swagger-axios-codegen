@@ -69,3 +69,6 @@ __src
 /example/src/**
 orion.json
 .DS_Store
+.vscode/**
+flipdishdev.json
+service/**

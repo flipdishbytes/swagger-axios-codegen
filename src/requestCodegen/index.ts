@@ -38,7 +38,18 @@ export function requestCodegen(paths: IPaths): IRequestClass {
       let parameters = ''
       let handleNullParameters = ''
       let parsedParameters: any = {}
+
       if (reqProps.parameters) {
+        reqProps.parameters = reqProps.parameters.reduce((agg, p, i) => {
+          if (agg.some(l => l.name === p.name)) {
+            agg.push({ ...p, name: p.name + '2' })
+          } else {
+            agg.push(p)
+          }
+
+          return agg
+        }, [])
+
         // 获取到接口的参数
         parsedParameters = getRequestParameters(reqProps.parameters)
 
