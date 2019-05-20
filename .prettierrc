@@ -1,9 +1,10 @@
  {
-    "printWidth": 120,
+    "printWidth": 100,
     "tabWidth": 2,
     "parser": "babylon",
-    "trailingComma": "none",
+    "trailingComma": "es5",
     "jsxBracketSameLine": false,
     "semi": false,
-    "singleQuote": true
+    "singleQuote": true,
+    "arrowParens": "always"
  }

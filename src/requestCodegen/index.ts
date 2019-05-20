@@ -41,7 +41,7 @@ export function requestCodegen(paths: IPaths): IRequestClass {
 
       if (reqProps.parameters) {
         reqProps.parameters = reqProps.parameters.reduce((agg, p, i) => {
-          if (agg.some(l => l.name === p.name)) {
+          if (agg.some((l) => l.name === p.name)) {
             agg.push({ ...p, name: p.name + '2' })
           } else {
             agg.push(p)
@@ -60,7 +60,9 @@ export function requestCodegen(paths: IPaths): IRequestClass {
           } = <any>{},`
             : ''
 
-        formData = parsedParameters.requestFormData ? 'data = new FormData();\n' + parsedParameters.requestFormData : ''
+        formData = parsedParameters.requestFormData
+          ? 'data = new FormData();\n' + parsedParameters.requestFormData
+          : ''
         pathReplace = parsedParameters.requestPathReplace
       }
       const { responseType, isRef: refResponseType } = getResponseType(reqProps)
@@ -83,8 +85,8 @@ export function requestCodegen(paths: IPaths): IRequestClass {
           method,
           contentType,
           responseType,
-          formData
-        }
+          formData,
+        },
       })
     }
   }
